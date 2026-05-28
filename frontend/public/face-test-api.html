@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Test</title>
+</head>
+<body>
+    <h1>Face Recognition Test</h1>
+    
+    <button onclick="testFaceRecognition()">Test Face Recognition API</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function testFaceRecognition() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            // Sample face descriptor (same format as create page)
+            const testDescriptor = [
+                0.5, 0.3, 0.1,  // Point 1: x, y, z
+                0.4, 0.2, 0.05, // Point 33: x, y, z  
+                0.6, 0.25, 0.08, // Point 263: x, y, z
+                0.45, 0.4, 0.12, // Point 175: x, y, z
+                0.5, 0.15, 0.06, // Point 10: x, y, z
+                0.5, 0.6, 0.15,  // Point 152: x, y, z
+                0.48, 0.55, 0.14, // Point 148: x, y, z
+                0.52, 0.58, 0.16  // Point 172: x, y, z
+            ];
+            
+            const requestBody = {
+                faceDescriptor: testDescriptor,
+                imageBase64: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
+            };
+            
+            try {
+                console.log('Sending test request:', requestBody);
+                
+                const response = await fetch('http://localhost:8080/api/face-recognition/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const result = await response.json();
+                console.log('Test result:', result);
+                
+                resultDiv.innerHTML = `
+                    <h3>Result:</h3>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

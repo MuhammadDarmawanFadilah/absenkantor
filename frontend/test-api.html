@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Pegawai</title>
+</head>
+<body>
+    <h1>Test API Pegawai</h1>
+    <button onclick="testAPI()">Test Load Pegawai</button>
+    <div id="result"></div>
+    
+    <script>
+        const getApiUrl = (endpoint) => {
+            const baseUrl = 'http://localhost:8080/api'
+            const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+            return `${baseUrl}/${cleanEndpoint}`;
+        };
+        
+        async function testAPI() {
+            try {
+                console.log('Testing API call...')
+                const url = getApiUrl('pegawai?withoutFaceRecognition=true')
+                console.log('URL:', url)
+                
+                const response = await fetch(url)
+                console.log('Response status:', response.status)
+                
+                if (response.ok) {
+                    const data = await response.json()
+                    console.log('Data received:', data)
+                    
+                    const pegawaiData = data.pegawai || data.content || data.data || data || []
+                    console.log('Pegawai data:', pegawaiData)
+                    
+                    document.getElementById('result').innerHTML = `
+                        <h3>Success!</h3>
+                        <p>Total pegawai: ${pegawaiData.length}</p>
+                        <pre>${JSON.stringify(pegawaiData.slice(0, 2), null, 2)}</pre>
+                    `
+                } else {
+                    document.getElementById('result').innerHTML = `<p>Error: ${response.status}</p>`
+                }
+            } catch (error) {
+                console.error('Error:', error)
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`
+            }
+        }
+    </script>
+</body>
+</html>

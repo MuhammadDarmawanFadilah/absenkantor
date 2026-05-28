@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 300px;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            min-height: 300px;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .start-btn {
+            background: #007bff;
+            color: white;
+        }
+        .stop-btn {
+            background: #dc3545;
+            color: white;
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Camera Test</h1>
+        
+        <div class="info">
+            <h3>Browser Support Check:</h3>
+            <p id="browser-support"></p>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn" class="start-btn">Start Camera</button>
+            <button id="stop-btn" class="stop-btn" disabled>Stop Camera</button>
+            <button id="devices-btn" class="start-btn">List Devices</button>
+        </div>
+        
+        <div class="video-container">
+            <video id="video" autoplay playsinline muted></video>
+        </div>
+        
+        <div id="status" class="info">
+            <p>Click "Start Camera" to begin</p>
+        </div>
+        
+        <div id="devices-info" class="info" style="display: none;">
+            <h3>Available Devices:</h3>
+            <ul id="devices-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const devicesBtn = document.getElementById('devices-btn');
+        const status = document.getElementById('status');
+        const devicesInfo = document.getElementById('devices-info');
+        const devicesList = document.getElementById('devices-list');
+        const browserSupport = document.getElementById('browser-support');
+        
+        let currentStream = null;
+        
+        // Check browser support
+        function checkBrowserSupport() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                browserSupport.innerHTML = '✅ Your browser supports camera access';
+                browserSupport.parentElement.className = 'success';
+            } else {
+                browserSupport.innerHTML = '❌ Your browser does not support camera access';
+                browserSupport.parentElement.className = 'error';
+            }
+        }
+        
+        // Start camera
+        async function startCamera() {
+            try {
+                status.innerHTML = '🔄 Starting camera...';
+                status.className = 'info';
+                
+                const constraints = {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    }
+                };
+                
+                console.log('Requesting camera with constraints:', constraints);
+                
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                console.log('Camera stream obtained:', stream);
+                console.log('Video tracks:', stream.getVideoTracks());
+                
+                video.srcObject = stream;
+                currentStream = stream;
+                
+                // Wait for video to load
+                video.onloadedmetadata = () => {
+                    console.log('Video metadata loaded:', {
+                        width: video.videoWidth,
+                        height: video.videoHeight,
+                        readyState: video.readyState
+                    });
+                    
+                    status.innerHTML = `✅ Camera started successfully<br>
+                        Resolution: ${video.videoWidth}x${video.videoHeight}<br>
+                        Ready State: ${video.readyState}`;
+                    status.className = 'success';
+                };
+                
+                video.onloadeddata = () => {
+                    console.log('Video data loaded');
+                };
+                
+                video.oncanplay = () => {
+                    console.log('Video can play');
+                };
+                
+                video.onplaying = () => {
+                    console.log('Video is playing');
+                };
+                
+                video.onerror = (e) => {
+                    console.error('Video error:', e);
+                    status.innerHTML = '❌ Video error: ' + e.message;
+                    status.className = 'error';
+                };
+                
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error starting camera:', error);
+                status.innerHTML = `❌ Error: ${error.message}<br>
+                    <small>Make sure you have a camera connected and granted permission.</small>`;
+                status.className = 'error';
+            }
+        }
+        
+        // Stop camera
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => {
+                    console.log('Stopping track:', track.kind, track.label);
+                    track.stop();
+                });
+                currentStream = null;
+            }
+            
+            video.srcObject = null;
+            
+            status.innerHTML = '🛑 Camera stopped';
+            status.className = 'info';
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        
+        // List devices
+        async function listDevices() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                devicesList.innerHTML = '';
+                
+                if (videoDevices.length === 0) {
+                    devicesList.innerHTML = '<li>No video input devices found</li>';
+                } else {
+                    videoDevices.forEach((device, index) => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <strong>Device ${index + 1}:</strong><br>
+                            Label: ${device.label || 'Unknown'}<br>
+                            ID: ${device.deviceId}<br>
+                            Group: ${device.groupId}
+                        `;
+                        devicesList.appendChild(li);
+                    });
+                }
+                
+                devicesInfo.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error listing devices:', error);
+                devicesList.innerHTML = `<li>Error: ${error.message}</li>`;
+                devicesInfo.style.display = 'block';
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        devicesBtn.addEventListener('click', listDevices);
+        
+        // Initialize
+        checkBrowserSupport();
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopCamera();
+        });
+    </script>
+</body>
+</html>

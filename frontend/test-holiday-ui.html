@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Holiday Notification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .alert { padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .alert-warning { background: #fef3c7; border: 2px solid #fbbf24; color: #92400e; }
+        .badge { background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .success { color: #059669; }
+        .error { color: #dc2626; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; background: #3b82f6; color: white; }
+        #result { margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🎉 Test Notifikasi Hari Libur - Sistem Absensi</h1>
+    
+    <div class="test-section">
+        <h2>📅 Status Hari Ini (2025-08-07)</h2>
+        <div id="dateStatus">Mengecek status hari libur...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Test API Backend</h2>
+        <button onclick="testHolidayAPI()">Test API Hari Libur</button>
+        <button onclick="testLoginAPI()">Test API Login</button>
+        <div id="apiResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎨 Preview Notifikasi</h2>
+        <div id="notificationPreview"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Hasil Test</h2>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8080/api';
+        const TODAY = '2025-08-07';
+
+        // Set tanggal hari ini
+        document.getElementById('dateStatus').innerHTML = `
+            <strong>Tanggal:</strong> ${new Date().toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })}
+        `;
+
+        async function testHolidayAPI() {
+            const apiResult = document.getElementById('apiResult');
+            apiResult.innerHTML = 'Testing API...';
+            
+            try {
+                // Test check API
+                const checkResponse = await fetch(`${BASE_URL}/hari-libur/check/${TODAY}`);
+                const checkData = await checkResponse.json();
+                
+                console.log('Holiday check:', checkData);
+                
+                if (checkData.isHariLibur) {
+                    // Get holiday details
+                    const detailResponse = await fetch(`${BASE_URL}/hari-libur?page=0&size=200`);
+                    const detailData = await detailResponse.json();
+                    const holiday = detailData.data.find(h => h.tanggalLibur === TODAY);
+                    
+                    if (holiday) {
+                        apiResult.innerHTML = `
+                            <div class="success">
+                                ✅ API Berhasil<br>
+                                <strong>Nama:</strong> ${holiday.namaLibur}<br>
+                                <strong>Tanggal:</strong> ${holiday.tanggalLibur}<br>
+                                <strong>Nasional:</strong> ${holiday.isNasional ? 'Ya' : 'Tidak'}<br>
+                                <strong>Keterangan:</strong> ${holiday.keterangan}
+                            </div>
+                        `;
+                        
+                        // Show notification preview
+                        showNotificationPreview(holiday);
+                    } else {
+                        apiResult.innerHTML = '<div class="error">❌ Data hari libur tidak ditemukan</div>';
+                    }
+                } else {
+                    apiResult.innerHTML = '<div class="success">✅ Hari ini bukan hari libur</div>';
+                }
+            } catch (error) {
+                apiResult.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testLoginAPI() {
+            try {
+                const loginResponse = await fetch(`${BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    document.getElementById('apiResult').innerHTML += `
+                        <div class="success">✅ Login berhasil untuk user: ${loginData.user.fullName}</div>
+                    `;
+                } else {
+                    throw new Error('Login gagal');
+                }
+            } catch (error) {
+                document.getElementById('apiResult').innerHTML += `
+                    <div class="error">❌ Login error: ${error.message}</div>
+                `;
+            }
+        }
+
+        function showNotificationPreview(holiday) {
+            const preview = document.getElementById('notificationPreview');
+            preview.innerHTML = `
+                <div class="alert alert-warning">
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 10px;">📅</div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <strong style="font-size: 16px;">🎉 Hari Libur: ${holiday.namaLibur}</strong>
+                                ${holiday.isNasional ? '<span class="badge" style="margin-left: 10px;">🏛️ Nasional</span>' : ''}
+                            </div>
+                            <p style="margin: 4px 0; font-weight: 500;">
+                                ✨ Hari ini adalah hari libur, namun Anda tetap dapat melakukan absensi jika diperlukan.
+                            </p>
+                            <p style="margin: 0; font-size: 12px; opacity: 0.8;">
+                                📅 ${new Date().toLocaleDateString('id-ID', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                })}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Update result
+            document.getElementById('result').innerHTML = `
+                <div class="success">
+                    <h3>✅ Test Berhasil!</h3>
+                    <p>Notifikasi hari libur sudah berfungsi dengan baik.</p>
+                    <p><strong>Next Step:</strong> Buka <a href="http://localhost:3001/pegawai/absensi" target="_blank">halaman absensi</a> dan login untuk melihat notifikasi yang sebenarnya.</p>
+                    <p><strong>Credentials:</strong> username: admin, password: admin123</p>
+                </div>
+            `;
+        }
+
+        // Auto test when page loads
+        window.onload = function() {
+            setTimeout(testHolidayAPI, 1000);
+        };
+    </script>
+</body>
+</html>

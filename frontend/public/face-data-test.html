@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Data Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .result { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; white-space: pre-wrap; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Recognition Data Test</h1>
+        
+        <button class="button" onclick="listFaceRecognitions()">List All Face Recognitions</button>
+        <button class="button" onclick="testWithSampleData()">Test Recognition with Sample Data</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function listFaceRecognitions() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Loading face recognition data...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/face-recognition?page=0&size=10');
+                const result = await response.json();
+                
+                console.log('Face recognition data:', result);
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `Found ${result.pagination.totalItems} face recognition records:\n\n` + 
+                        JSON.stringify(result.data, null, 2);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `Error: ${result.message}`;
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testWithSampleData() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing face recognition with sample data...';
+            
+            // First get available face recognition data
+            try {
+                const listResponse = await fetch('http://localhost:8080/api/face-recognition?page=0&size=1');
+                const listResult = await listResponse.json();
+                
+                if (!listResult.success || listResult.data.length === 0) {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = 'No face recognition data found. Please create some data first using the create page.';
+                    return;
+                }
+                
+                const firstRecord = listResult.data[0];
+                console.log('Testing against first record:', firstRecord);
+                
+                // Sample face descriptor (same format as create page - 8 landmarks x 3 coordinates = 24 values)
+                const testDescriptor = [
+                    0.5, 0.3, 0.1,    // Point 1: nose tip
+                    0.4, 0.2, 0.05,   // Point 33: left eye
+                    0.6, 0.25, 0.08,  // Point 263: right eye  
+                    0.45, 0.4, 0.12,  // Point 175: chin
+                    0.5, 0.15, 0.06,  // Point 10: forehead
+                    0.5, 0.6, 0.15,   // Point 152: jaw
+                    0.48, 0.55, 0.14, // Point 148: left jaw
+                    0.52, 0.58, 0.16  // Point 172: right jaw
+                ];
+                
+                const requestBody = {
+                    faceDescriptor: testDescriptor,
+                    imageBase64: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...",
+                    targetFaceRecognitionId: firstRecord.id
+                };
+                
+                console.log('Sending test request:', requestBody);
+                
+                const response = await fetch('http://localhost:8080/api/face-recognition/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const result = await response.json();
+                console.log('Test result:', result);
+                
+                resultDiv.className = 'result ' + (result.success ? 'success' : 'error');
+                resultDiv.innerHTML = `Test Result:\n\n${JSON.stringify(result, null, 2)}`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

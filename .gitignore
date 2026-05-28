@@ -1,0 +1,28 @@
+# Deployment files - tidak perlu di push ke repository
+ABSENKANTOR-DEPLOYMENT-GUIDE.md
+redeploy-backend-absenkantor.sh
+redeploy-frontend-absenkantor.sh
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+backend/backend/storage/

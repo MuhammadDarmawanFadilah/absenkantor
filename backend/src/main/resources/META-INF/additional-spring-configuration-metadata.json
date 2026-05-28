@@ -1,0 +1,90 @@
+{
+  "groups": [
+    { "name": "app.upload", "type": "com.shadcn.backend.config.props.UploadProperties", "sourceType": "com.shadcn.backend.config.props.UploadProperties" },
+    { "name": "app.wilayah.api", "type": "com.shadcn.backend.config.props.WilayahApiProperties", "sourceType": "com.shadcn.backend.config.props.WilayahApiProperties" },
+    { "name": "app.cors", "type": "com.shadcn.backend.config.props.CorsProperties", "sourceType": "com.shadcn.backend.config.props.CorsProperties" },
+    { "name": "app.face.threshold", "type": "com.shadcn.backend.config.props.FaceRecognitionProperties", "sourceType": "com.shadcn.backend.config.props.FaceRecognitionProperties" }
+  ],
+  "properties": [
+    { "name": "app.timezone", "type": "java.lang.String", "description": "Default application timezone (e.g., Asia/Jakarta)." },
+    { "name": "app.upload.dir", "type": "java.lang.String", "description": "Base directory for file uploads." },
+    { "name": "app.upload.max-file-size", "type": "java.lang.Long", "description": "Maximum upload file size in bytes." },
+  { "name": "app.upload.photos.directory", "type": "java.lang.String", "description": "Directory for uploaded photos." },
+  { "name": "app.upload.photos.max-file-size", "type": "java.lang.Long", "description": "Maximum photo upload size in bytes." },
+  { "name": "app.upload.photos.allowed-types", "type": "java.lang.String", "description": "Allowed photo mime types (comma-separated)." },
+
+    { "name": "app.wilayah.api.base-url", "type": "java.lang.String", "description": "Base URL for Wilayah API." },
+    { "name": "app.wilayah.api.timeout", "type": "java.lang.Integer", "description": "Timeout for Wilayah API in milliseconds." },
+    { "name": "app.wilayah.api.enabled", "type": "java.lang.Boolean", "description": "Enable Wilayah API integration." },
+  { "name": "app.wilayah.api.cache-enabled", "type": "java.lang.Boolean", "description": "Enable caching for Wilayah API." },
+
+    { "name": "app.cors.allowed-origins", "type": "java.lang.String", "description": "Comma-separated allowed origins for CORS." },
+    { "name": "cors.allowed-origins", "type": "java.lang.String", "description": "Legacy CORS allowed origins property." },
+
+    { "name": "app.face.threshold.self", "type": "java.lang.Double", "description": "Similarity threshold for self face verification." },
+    { "name": "app.face.threshold.global", "type": "java.lang.Double", "description": "Similarity threshold for global best match." },
+    { "name": "app.face.threshold.specific", "type": "java.lang.Double", "description": "Similarity threshold for specific face record verification." },
+
+    { "name": "pusher.app.id", "type": "java.lang.String", "description": "Pusher App ID." },
+    { "name": "pusher.app.key", "type": "java.lang.String", "description": "Pusher App Key." },
+    { "name": "pusher.app.secret", "type": "java.lang.String", "description": "Pusher App Secret." },
+    { "name": "pusher.app.cluster", "type": "java.lang.String", "description": "Pusher App Cluster." },
+
+    { "name": "file.upload.directory", "type": "java.lang.String", "description": "Cuti file upload directory." },
+
+    { "name": "app.seeder.insert-dummy-data", "type": "java.lang.String", "description": "Enable dummy data seeder (yes/no)." },
+    { "name": "app.seeder.role.enabled", "type": "java.lang.Boolean", "description": "Enable role seeder." },
+    { "name": "app.seeder.lokasi-kantor.enabled", "type": "java.lang.Boolean", "description": "Enable lokasi kantor seeder." },
+    { "name": "app.seeder.shift.enabled", "type": "java.lang.Boolean", "description": "Enable shift seeder." },
+  { "name": "app.seeder.absensi.august-2025", "type": "java.lang.String", "description": "Enable August 2025 absensi seeder (yes/no)." },
+  { "name": "app.seeder.absensi.september-2025", "type": "java.lang.String", "description": "Enable September 2025 absensi seeder (yes/no)." },
+
+    { "name": "app.image.upload-dir", "type": "java.lang.String", "description": "Image upload directory." },
+    { "name": "app.image.max-file-size", "type": "java.lang.String", "description": "Max image size (e.g., 10MB)." },
+    { "name": "app.image.allowed-types", "type": "java.lang.String", "description": "Allowed image types (comma-separated)." },
+    { "name": "app.image.serve-path", "type": "java.lang.String", "description": "Serve path for images." },
+
+    { "name": "app.video.upload-dir", "type": "java.lang.String", "description": "Video upload directory." },
+    { "name": "app.video.max-file-size", "type": "java.lang.String", "description": "Max video size (e.g., 100MB)." },
+    { "name": "app.video.allowed-types", "type": "java.lang.String", "description": "Allowed video types (comma-separated)." },
+
+    { "name": "app.document.upload-dir", "type": "java.lang.String", "description": "Document upload directory." },
+    { "name": "app.document.max-file-size", "type": "java.lang.String", "description": "Max document size (e.g., 50MB)." },
+    { "name": "app.document.allowed-types", "type": "java.lang.String", "description": "Allowed document types (comma-separated)." },
+
+    { "name": "whatsapp.api.url", "type": "java.lang.String", "description": "WhatsApp API base URL." },
+    { "name": "whatsapp.api.token", "type": "java.lang.String", "description": "WhatsApp API token." },
+    { "name": "whatsapp.api.sender", "type": "java.lang.String", "description": "WhatsApp sender number." },
+    { "name": "whatsapp.api.enabled", "type": "java.lang.Boolean", "description": "Enable WhatsApp integration." },
+
+    { "name": "app.frontend.url", "type": "java.lang.String", "description": "Frontend application URL." },
+    { "name": "frontend.url", "type": "java.lang.String", "description": "Legacy frontend URL property." },
+
+    { "name": "app.invitation.expiry-days", "type": "java.lang.Integer", "description": "Invitation expiry in days." },
+
+    { "name": "location.data.force-reinsert", "type": "java.lang.Boolean", "description": "Force reinsert of location data." },
+
+    { "name": "master.data.agama.force-reinsert", "type": "java.lang.Boolean", "description": "Force reinsert master data agama." },
+    { "name": "master.data.spesialisasi.force-reinsert", "type": "java.lang.Boolean", "description": "Force reinsert master data spesialisasi." },
+    { "name": "master.data.posisi.force-reinsert", "type": "java.lang.Boolean", "description": "Force reinsert master data posisi." },
+    { "name": "master.data.hobi.force-reinsert", "type": "java.lang.Boolean", "description": "Force reinsert master data hobi." },
+
+    { "name": "app.admin.username", "type": "java.lang.String", "description": "Default admin username." },
+    { "name": "app.admin.password", "type": "java.lang.String", "description": "Default admin password." },
+    { "name": "app.admin.email", "type": "java.lang.String", "description": "Default admin email." },
+    { "name": "app.admin.fullname", "type": "java.lang.String", "description": "Default admin full name." },
+    { "name": "app.admin.phone", "type": "java.lang.String", "description": "Default admin phone number." },
+
+    { "name": "app.security.jwt.secret", "type": "java.lang.String", "description": "JWT secret for signing tokens." },
+    { "name": "app.security.jwt.expiration", "type": "java.lang.Long", "description": "JWT expiration in milliseconds." },
+
+    { "name": "app.payment.prefix", "type": "java.lang.String", "description": "Payment code prefix." },
+    { "name": "app.payment.id-length", "type": "java.lang.Integer", "description": "Payment ID length." },
+
+    { "name": "app.sample-data.enabled", "type": "java.lang.Boolean", "description": "Enable sample data seeding." },
+    { "name": "app.sample-data.jabatan.enabled", "type": "java.lang.Boolean", "description": "Enable sample data for jabatan." },
+
+    { "name": "app.seeder.insert-dummy", "type": "java.lang.String", "description": "Legacy flag to insert dummy data (yes/no)." },
+    { "name": "app.seeder.absensi-august-2025.enabled", "type": "java.lang.Boolean", "description": "Enable seeder for absensi August 2025." }
+  ]
+}
